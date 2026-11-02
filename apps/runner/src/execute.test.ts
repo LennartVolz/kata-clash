@@ -97,15 +97,24 @@ describe.skipIf(!imagesAvailable)('executeRun in der Sandbox', () => {
   it('verhindert Netzwerkzugriffe', async () => {
     const result = await executeRun(
       job({
-        code: 'async function solve() {\n  const res = await fetch("https://example.com");\n  return res.status;\n}',
-        timeLimitMs: 3_000,
+        code: [
+          'async function solve() {',
+          '  const res = await fetch("https://example.com", { signal: AbortSignal.timeout(1200) });',
+          '  return res.status;',
+          '}',
+        ].join('\n'),
+        timeLimitMs: 4_000,
       }),
       testConfig,
     );
 
-    expect(result.status).not.toBe('passed');
+    // Ohne Netzwerk-Namespace schlägt DNS/Verbindung fehl; der Abort verhindert,
+    // dass der Test stattdessen ins Gesamt-Zeitlimit läuft.
+    expect(result.status).toBe('failed');
     expect(result.tests[0]?.passed).toBe(false);
-    expect(result.tests[0]?.error).toMatch(/fetch|network|ENOTFOUND|EAI_AGAIN/i);
+    expect(result.tests[0]?.error).toMatch(
+      /timeout|abort|fetch failed|ENOTFOUND|EAI_AGAIN|ENETUNREACH|EHOSTUNREACH/i,
+    );
   });
 
   it('stoppt eine Fork-Bombe per PIDs-Limit', async () => {
