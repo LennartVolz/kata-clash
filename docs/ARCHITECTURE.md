@@ -32,19 +32,19 @@ Der Server ist autoritativ: Zeit, Sieger und Elo werden ausschließlich serverse
 
 ## Socket.IO-Events (Entwurf)
 
-| Richtung | Event | Payload |
-|---|---|---|
-| C→S | `queue:join` / `queue:leave` | `{ language }` |
-| S→C | `match:found` | `{ matchId, opponent }` |
-| S→C | `match:start` | `{ kata, startsAt, endsAt }` |
-| C→S | `code:update` | `{ matchId, code }` (gedrosselt) |
-| C→S | `code:run` | `{ matchId, code }` (nur sichtbare Tests) |
-| C→S | `code:submit` | `{ matchId, code }` (alle Tests) |
-| S→C | `run:result` | `{ passed, failed, output }` |
-| S→C | `opponent:progress` | `{ testsPassed, total }` (ohne Code) |
-| S→C | `match:end` | `{ winnerId, eloDelta }` |
-| C↔S | `chat:message` | `{ matchId, text }` |
-| C→S | `spectate:join` | `{ matchId }` |
+| Richtung | Event                        | Payload                                   |
+| -------- | ---------------------------- | ----------------------------------------- |
+| C→S      | `queue:join` / `queue:leave` | `{ language }`                            |
+| S→C      | `match:found`                | `{ matchId, opponent }`                   |
+| S→C      | `match:start`                | `{ kata, startsAt, endsAt }`              |
+| C→S      | `code:update`                | `{ matchId, code }` (gedrosselt)          |
+| C→S      | `code:run`                   | `{ matchId, code }` (nur sichtbare Tests) |
+| C→S      | `code:submit`                | `{ matchId, code }` (alle Tests)          |
+| S→C      | `run:result`                 | `{ passed, failed, output }`              |
+| S→C      | `opponent:progress`          | `{ testsPassed, total }` (ohne Code)      |
+| S→C      | `match:end`                  | `{ winnerId, eloDelta }`                  |
+| C↔S      | `chat:message`               | `{ matchId, text }`                       |
+| C→S      | `spectate:join`              | `{ matchId }`                             |
 
 Alle Payloads werden mit Zod-Schemas aus `packages/shared` auf Server und Client validiert.
 
@@ -77,9 +77,9 @@ Update: `R_A' = R_A + K · (S_A − E_A)`, mit `S = 1` Sieg, `0,5` Remis, `0` Ni
 
 ## Zentrale Entscheidungen
 
-| Frage | Entscheidung | Begründung |
-|---|---|---|
-| Socket.IO vs. rohe WebSockets | Socket.IO | Rooms, Reconnect, Redis-Adapter fertig vorhanden |
-| Code-Sync | nur Fortschritt, kein Live-Code des Gegners | verhindert Abschreiben; Zuschauer ggf. mit Verzögerung |
-| Sprachen im MVP | JavaScript + Python | einfache, schnelle Sandbox-Images |
-| Monorepo | pnpm Workspaces | geteilte Typen zwischen Client und Server |
+| Frage                         | Entscheidung                                | Begründung                                             |
+| ----------------------------- | ------------------------------------------- | ------------------------------------------------------ |
+| Socket.IO vs. rohe WebSockets | Socket.IO                                   | Rooms, Reconnect, Redis-Adapter fertig vorhanden       |
+| Code-Sync                     | nur Fortschritt, kein Live-Code des Gegners | verhindert Abschreiben; Zuschauer ggf. mit Verzögerung |
+| Sprachen im MVP               | JavaScript + Python                         | einfache, schnelle Sandbox-Images                      |
+| Monorepo                      | pnpm Workspaces                             | geteilte Typen zwischen Client und Server              |

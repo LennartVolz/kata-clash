@@ -13,16 +13,16 @@ Echtzeit-Code-Duelle: Zwei Entwickler bekommen dieselbe kleine Programmieraufgab
 
 ## Tech-Stack
 
-| Bereich | Technologie |
-|---|---|
-| Frontend | Next.js (App Router), React, TypeScript, Tailwind CSS, Monaco Editor |
-| Echtzeit | Node.js, Socket.IO |
-| API/Backend | Node.js, TypeScript (Fastify), Zod |
-| Datenbank | PostgreSQL + Prisma |
-| Cache/Queue | Redis (Matchmaking, Pub/Sub, Job-Queue für Runner) |
-| Code-Ausführung | Docker (isolierte, ressourcenbegrenzte Sandbox-Container) |
-| Auth | Auth.js (GitHub-/Credentials-Login) |
-| Tooling | pnpm-Monorepo, ESLint, Vitest, Playwright, GitHub Actions |
+| Bereich         | Technologie                                                          |
+| --------------- | -------------------------------------------------------------------- |
+| Frontend        | Next.js (App Router), React, TypeScript, Tailwind CSS, Monaco Editor |
+| Echtzeit        | Node.js, Socket.IO                                                   |
+| API/Backend     | Node.js, TypeScript (Fastify), Zod                                   |
+| Datenbank       | PostgreSQL + Prisma                                                  |
+| Cache/Queue     | Redis (Matchmaking, Pub/Sub, Job-Queue für Runner)                   |
+| Code-Ausführung | Docker (isolierte, ressourcenbegrenzte Sandbox-Container)            |
+| Auth            | Auth.js (GitHub-/Credentials-Login)                                  |
+| Tooling         | pnpm-Monorepo, ESLint, Vitest, Playwright, GitHub Actions            |
 
 ## Geplante Projektstruktur
 
@@ -49,4 +49,17 @@ kata-clash/
 
 ## Status
 
-🧭 Planungsphase – noch kein lauffähiger Code.
+🚧 Phase 0 abgeschlossen: Monorepo-Gerüst steht. `apps/web` (Next.js) folgt in Phase 2, der Sandbox-Runner in Phase 1.
+
+## Entwicklung
+
+Voraussetzungen: Node.js 22+, pnpm 10 (`corepack enable`), Docker.
+
+```bash
+cp .env.example .env     # lokale Konfiguration
+pnpm install
+pnpm infra:up            # PostgreSQL + Redis starten
+pnpm dev:server          # API auf http://localhost:4000/health
+
+pnpm format:check && pnpm lint && pnpm typecheck && pnpm test
+```

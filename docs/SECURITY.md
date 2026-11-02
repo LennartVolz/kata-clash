@@ -4,14 +4,14 @@ Fremden Code auszuführen ist das größte Risiko des Projekts. Grundsatz: **Der
 
 ## Sandbox
 
-| Maßnahme | Umsetzung |
-|---|---|
-| Isolation | Ein frischer Container pro Ausführung, danach sofort löschen |
-| Netzwerk | `--network none` |
-| Dateisystem | `--read-only`, nur kleines tmpfs für Temp-Dateien |
-| Ressourcen | `--memory`, `--cpus`, `--pids-limit`, Zeitlimit mit hartem Kill |
-| Rechte | Nicht-root-User, `--cap-drop ALL`, `no-new-privileges`, Standard-seccomp |
-| Ausgabe | Größenlimit für stdout/stderr, danach abgeschnitten |
+| Maßnahme       | Umsetzung                                                                   |
+| -------------- | --------------------------------------------------------------------------- |
+| Isolation      | Ein frischer Container pro Ausführung, danach sofort löschen                |
+| Netzwerk       | `--network none`                                                            |
+| Dateisystem    | `--read-only`, nur kleines tmpfs für Temp-Dateien                           |
+| Ressourcen     | `--memory`, `--cpus`, `--pids-limit`, Zeitlimit mit hartem Kill             |
+| Rechte         | Nicht-root-User, `--cap-drop ALL`, `no-new-privileges`, Standard-seccomp    |
+| Ausgabe        | Größenlimit für stdout/stderr, danach abgeschnitten                         |
 | Docker-Zugriff | Runner-Prozess läuft getrennt vom Web-Server; kein Docker-Socket in Web/API |
 
 Für höhere Sicherheit später: gVisor (`runsc`) oder Firecracker statt Standard-runc, oder Runner auf separaten Hosts.
