@@ -8,6 +8,9 @@
     "start": "tsx src/index.ts",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@kata-clash/shared": "workspace:*"
+  },
   "devDependencies": {
     "tsx": "^4.23.15"
   }

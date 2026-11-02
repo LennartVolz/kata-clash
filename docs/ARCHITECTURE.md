@@ -65,7 +65,9 @@ Update: `R_A' = R_A + K · (S_A − E_A)`, mit `S = 1` Sieg, `0,5` Remis, `0` Ni
 ## Code-Ausführung (Runner)
 
 - Pro Run ein frischer Container aus einem vorgebauten Sprach-Image (zunächst JavaScript/TypeScript und Python).
-- Code und Tests werden per Volume/stdin hineingereicht, Ergebnis als JSON über stdout.
+- Code und Testeingaben werden per read-only Volume hineingereicht; Erwartungswerte bleiben im
+  Runner. Der Container liefert nur die Rückgabewerte als JSON über stdout, verglichen wird außerhalb
+  der Sandbox (siehe [SECURITY.md](SECURITY.md)).
 - Harte Limits: CPU, RAM, PIDs, Laufzeit, Ausgabegröße; kein Netzwerk; read-only Root-FS.
 - Details siehe [SECURITY.md](SECURITY.md).
 

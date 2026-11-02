@@ -1,0 +1,9 @@
+{
+  "language": "javascript",
+  "functionName": "solve",
+  "code": "function solve(a, b) {\n  return a + b;\n}\n",
+  "tests": [
+    { "id": "t1", "name": "2 + 3 = 5", "args": [2, 3], "expected": 5 },
+    { "id": "t2", "name": "negative Zahlen", "args": [-4, 1], "expected": -3, "hidden": true }
+  ]
+}

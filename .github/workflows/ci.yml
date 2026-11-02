@@ -19,4 +19,6 @@ jobs:
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
+      # Sandbox-Images für die Runner-Tests (Docker ist auf ubuntu-latest vorhanden).
+      - run: pnpm runner:images
       - run: pnpm test

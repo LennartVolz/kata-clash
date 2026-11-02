@@ -49,7 +49,9 @@ kata-clash/
 
 ## Status
 
-🚧 Phase 0 abgeschlossen: Monorepo-Gerüst steht. `apps/web` (Next.js) folgt in Phase 2, der Sandbox-Runner in Phase 1.
+✅ Phase 0 abgeschlossen: Monorepo-Gerüst steht.
+✅ Phase 1 abgeschlossen: Sandbox-Runner für JavaScript und Python mit Test-Harness, Härtung
+und Limit-Tests. `apps/web` (Next.js) folgt in Phase 2.
 
 ## Entwicklung
 
@@ -60,6 +62,9 @@ cp .env.example .env     # lokale Konfiguration
 pnpm install
 pnpm infra:up            # PostgreSQL + Redis starten
 pnpm dev:server          # API auf http://localhost:4000/health
+
+pnpm runner:images                       # Sandbox-Images bauen (JavaScript, Python)
+pnpm runner:job fixtures/js-sum.json     # einzelnen Kata-Job ausführen
 
 pnpm format:check && pnpm lint && pnpm typecheck && pnpm test
 ```

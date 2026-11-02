@@ -8,10 +8,15 @@
 
 ## Phase 1 – Sandbox-Runner (Kern-Risiko zuerst)
 
-- [ ] Runner-Image für JavaScript, Test-Harness mit JSON-Ausgabe
-- [ ] Ausführung mit allen Limits aus [SECURITY.md](SECURITY.md)
-- [ ] Tests mit Endlosschleife, Speicherbombe, Netzwerkzugriff, Fork-Bombe
-- [ ] Python-Image
+- [x] Runner-Image für JavaScript, Test-Harness mit JSON-Ausgabe
+- [x] Ausführung mit allen Limits aus [SECURITY.md](SECURITY.md)
+- [x] Tests mit Endlosschleife, Speicherbombe, Netzwerkzugriff, Fork-Bombe
+- [x] Python-Image
+
+Die Container-Tests (`apps/runner/src/execute.test.ts`) brauchen einen erreichbaren Docker-Daemon
+und gebaute Images (`pnpm runner:images`); ohne beides werden sie übersprungen. Die Anbindung an
+die Redis-Queue folgt in Phase 4 – aktuell nimmt der Runner einen Job als JSON-Datei oder über
+stdin entgegen.
 
 ## Phase 2 – Single-Player-Kata (ohne Echtzeit)
 
