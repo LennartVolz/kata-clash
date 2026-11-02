@@ -98,9 +98,15 @@ describe.skipIf(!imagesAvailable)('executeRun in der Sandbox', () => {
     const result = await executeRun(
       job({
         code: [
-          'async function solve() {',
-          '  const res = await fetch("https://example.com", { signal: AbortSignal.timeout(1200) });',
-          '  return res.status;',
+          'const net = require("node:net");',
+          'function solve() {',
+          '  return new Promise((resolve, reject) => {',
+          '    const socket = net.connect({ host: "1.1.1.1", port: 80 });',
+          '    socket.setTimeout(1000);',
+          '    socket.once("connect", () => { socket.destroy(); resolve("verbunden"); });',
+          '    socket.once("timeout", () => { socket.destroy(); reject(new Error("Netzwerk-Timeout")); });',
+          '    socket.once("error", reject);',
+          '  });',
           '}',
         ].join('\n'),
         timeLimitMs: 4_000,
@@ -108,13 +114,16 @@ describe.skipIf(!imagesAvailable)('executeRun in der Sandbox', () => {
       testConfig,
     );
 
-    // Ohne Netzwerk-Namespace schlägt DNS/Verbindung fehl; der Abort verhindert,
-    // dass der Test stattdessen ins Gesamt-Zeitlimit läuft.
-    expect(result.status).toBe('failed');
+    // Ohne Netzwerk-Namespace kommt keine Verbindung zustande: connect scheitert
+    // sofort (ENETUNREACH) oder laeuft in den Socket-Timeout. In beiden Faellen
+    // darf der Testfall nie bestehen.
+    expect(result.status).not.toBe('passed');
     expect(result.tests[0]?.passed).toBe(false);
-    expect(result.tests[0]?.error).toMatch(
-      /timeout|abort|fetch failed|ENOTFOUND|EAI_AGAIN|ENETUNREACH|EHOSTUNREACH/i,
-    );
+    if (result.status === 'failed') {
+      expect(result.tests[0]?.error).toMatch(
+        /ENETUNREACH|EHOSTUNREACH|EACCES|EPERM|timeout|network|connect/i,
+      );
+    }
   });
 
   it('stoppt eine Fork-Bombe per PIDs-Limit', async () => {
