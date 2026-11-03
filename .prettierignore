@@ -1,5 +1,6 @@
-node_modules
-dist
-.next
-coverage
-pnpm-lock.yaml
+# Generierter Prisma-Client (Prisma 7)
+packages/db/src/generated/
+
+# Next.js-Buildartefakte
+apps/web/.next/
+apps/web/next-env.d.ts

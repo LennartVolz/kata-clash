@@ -16,6 +16,8 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Prisma-Client erzeugen; braucht keine Datenbankverbindung.
+      - run: pnpm db:generate
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck

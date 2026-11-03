@@ -33,6 +33,7 @@ kata-clash/
 │   ├── server/       # API + Socket.IO Gateway
 │   └── runner/       # Worker: führt Code in Docker-Sandboxes aus
 ├── packages/
+│   ├── db/           # Prisma-Schema, Client und Nutzerfunktionen
 │   ├── shared/       # geteilte Typen, Zod-Schemas, Event-Definitionen
 │   ├── katas/        # Kata-Definitionen (Beschreibung, Starter-Code, Tests)
 │   └── elo/          # Elo-Berechnung (rein, gut testbar)
@@ -53,7 +54,9 @@ kata-clash/
 ✅ Phase 1 abgeschlossen: Sandbox-Runner für JavaScript und Python mit Test-Harness, Härtung
 und Limit-Tests.
 ✅ Phase 2 abgeschlossen: Kata-Bibliothek (8 Katas), REST-API und Next.js-Oberfläche mit
-Monaco-Editor. Echtzeit-Duelle folgen in Phase 4.
+Monaco-Editor.
+✅ Phase 3 abgeschlossen: Prisma-Schema samt Migration und Login über Auth.js
+(E-Mail/Passwort, optional GitHub) mit Profilseite. Echtzeit-Duelle folgen in Phase 4.
 
 ## Entwicklung
 
@@ -63,6 +66,7 @@ Voraussetzungen: Node.js 22+, pnpm 10 (`corepack enable`), Docker.
 cp .env.example .env     # lokale Konfiguration
 pnpm install
 pnpm infra:up            # PostgreSQL + Redis starten
+pnpm db:migrate          # Prisma-Migrationen anwenden (nach infra:up)
 pnpm dev:server          # API auf http://localhost:4000/health
 pnpm dev:web             # Oberfläche auf http://localhost:3000 (API muss laufen)
 

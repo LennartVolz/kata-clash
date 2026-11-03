@@ -30,8 +30,15 @@ führt nur die sichtbaren Tests aus; das Bewerten versteckter Tests gehört zum 
 
 ## Phase 3 – Auth und Datenbank
 
-- [ ] Prisma-Schema und Migrationen
-- [ ] Login (Auth.js), Nutzerprofil
+- [x] Prisma-Schema und Migrationen
+- [x] Login (Auth.js), Nutzerprofil
+
+Das Schema liegt in `packages/db` (Nutzer, OAuth-Konten, Sessions) mit der Initial-Migration
+unter `packages/db/prisma/migrations`. Der Login läuft über Auth.js im Next-Prozess: Credentials
+(E-Mail + Passwort, scrypt) sind immer aktiv, GitHub nur wenn `AUTH_GITHUB_ID` und
+`AUTH_GITHUB_SECRET` gesetzt sind. Sessions sind JWTs; die `Session`-Tabelle ist für OAuth
+vorbereitet. Die API selbst bleibt in Phase 3 noch ohne Auth – sie schützt in Phase 4 die
+Duell-Endpunkte.
 
 ## Phase 4 – Echtzeit-Duell (MVP-Kern)
 

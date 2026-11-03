@@ -84,6 +84,19 @@ Kindprozess (`apps/server/src/runner.ts`). Versteckte Tests bleiben im Server. D
 spricht nur mit ihrer eigenen Route `/api/run`; die reicht die Anfrage an die API weiter, damit
 die API keine CORS-Konfiguration braucht.
 
+## Auth und Daten (Phase 3)
+
+- **`packages/db`** enthält das Prisma-Schema, den generierten Client (Prisma 7, `prisma-client`
+  mit Pflicht-`output`) und die Nutzerfunktionen. Verbindung über den `@prisma/adapter-pg`-Treiber.
+- **Auth.js** läuft im Next-Prozess (`apps/web/auth.ts`): Prisma-Adapter, JWT-Sessions und ein
+  Credentials-Provider mit scrypt-Hashes aus `node:crypto`. GitHub ist optional und nur aktiv,
+  wenn `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET` gesetzt sind.
+- Registrierung erfolgt über `POST /api/register`; das Profil unter `/profil` liest den Nutzer
+  serverseitig über die Session-ID. `/login` und `/registrieren` sind öffentlich.
+- Migrationen werden versioniert committet. Ohne laufende Datenbank lassen sie sich mit
+  `prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script` erzeugen und
+  später mit `prisma migrate deploy` anwenden.
+
 ## Skalierung
 
 - Socket.IO mit Redis-Adapter erlaubt mehrere Gateway-Instanzen.
