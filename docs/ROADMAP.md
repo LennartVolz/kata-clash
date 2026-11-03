@@ -20,9 +20,13 @@ stdin entgegen.
 
 ## Phase 2 – Single-Player-Kata (ohne Echtzeit)
 
-- [ ] Next.js-Seite mit Monaco Editor
-- [ ] Kata-Format (Beschreibung, Starter-Code, Tests) und 5–10 Beispiel-Katas
-- [ ] Run/Submit über REST, Ergebnisanzeige
+- [x] Next.js-Seite mit Monaco Editor
+- [x] Kata-Format (Beschreibung, Starter-Code, Tests) und 5–10 Beispiel-Katas
+- [x] Run/Submit über REST, Ergebnisanzeige
+
+Die acht Beispiel-Katas liegen in `packages/katas`, die REST-Endpunkte in `apps/server`
+(`GET /katas`, `GET /katas/:slug`, `POST /runs`) und die Oberfläche in `apps/web`. `POST /runs`
+führt nur die sichtbaren Tests aus; das Bewerten versteckter Tests gehört zum Duell in Phase 4.
 
 ## Phase 3 – Auth und Datenbank
 

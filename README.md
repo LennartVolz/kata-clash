@@ -34,8 +34,8 @@ kata-clash/
 │   └── runner/       # Worker: führt Code in Docker-Sandboxes aus
 ├── packages/
 │   ├── shared/       # geteilte Typen, Zod-Schemas, Event-Definitionen
+│   ├── katas/        # Kata-Definitionen (Beschreibung, Starter-Code, Tests)
 │   └── elo/          # Elo-Berechnung (rein, gut testbar)
-├── katas/            # Kata-Definitionen (Markdown + Tests als Dateien)
 ├── docker/           # Dockerfiles (Runner-Images pro Sprache)
 ├── docs/             # Architektur, Roadmap, Security
 └── docker-compose.yml
@@ -51,7 +51,9 @@ kata-clash/
 
 ✅ Phase 0 abgeschlossen: Monorepo-Gerüst steht.
 ✅ Phase 1 abgeschlossen: Sandbox-Runner für JavaScript und Python mit Test-Harness, Härtung
-und Limit-Tests. `apps/web` (Next.js) folgt in Phase 2.
+und Limit-Tests.
+✅ Phase 2 abgeschlossen: Kata-Bibliothek (8 Katas), REST-API und Next.js-Oberfläche mit
+Monaco-Editor. Echtzeit-Duelle folgen in Phase 4.
 
 ## Entwicklung
 
@@ -62,6 +64,7 @@ cp .env.example .env     # lokale Konfiguration
 pnpm install
 pnpm infra:up            # PostgreSQL + Redis starten
 pnpm dev:server          # API auf http://localhost:4000/health
+pnpm dev:web             # Oberfläche auf http://localhost:3000 (API muss laufen)
 
 pnpm runner:images                       # Sandbox-Images bauen (JavaScript, Python)
 pnpm runner:job fixtures/js-sum.json     # einzelnen Kata-Job ausführen

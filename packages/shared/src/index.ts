@@ -79,6 +79,81 @@ export interface RunResult {
   error?: string;
 }
 
+// --- Katas und REST-API (Phase 2) --------------------------------------------
+
+export const KATA_DIFFICULTIES = ['easy', 'medium', 'hard'] as const;
+export const kataDifficultySchema = z.enum(KATA_DIFFICULTIES);
+export type KataDifficulty = z.infer<typeof kataDifficultySchema>;
+
+/**
+ * Eine Kata: Beschreibung, Starter-Code für beide Sprachen und Testfälle.
+ * Versteckte Tests verlassen den Server nie.
+ */
+export const kataSchema = z.object({
+  slug: z
+    .string()
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug muss kleingeschrieben sein und Bindestriche nutzen'),
+  title: z.string().min(1),
+  /** Reiner Text mit Zeilenumbrüchen; das Frontend rendert ihn ohne Markdown-Parser. */
+  description: z.string().min(1),
+  difficulty: kataDifficultySchema,
+  /** Zeitlimit eines Duells in Sekunden. */
+  timeLimitSec: z.number().int().min(30).max(1800),
+  functionName: z
+    .string()
+    .regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/, 'Ungültiger Funktionsname')
+    .default('solve'),
+  starterCode: z.object({
+    javascript: z.string().min(1),
+    python: z.string().min(1),
+  }),
+  tests: z.array(kataTestCaseSchema).min(1).max(MAX_TESTS_PER_RUN),
+});
+export type Kata = z.infer<typeof kataSchema>;
+
+/** Ein Testfall, wie ihn die API an den Client gibt (nur sichtbare Tests). */
+export interface PublicTestCase {
+  id: string;
+  name: string;
+  args: unknown[];
+  expected: unknown;
+}
+
+export interface KataSummary {
+  slug: string;
+  title: string;
+  difficulty: KataDifficulty;
+  timeLimitSec: number;
+  visibleTests: number;
+  totalTests: number;
+}
+
+export interface KataDetail extends KataSummary {
+  description: string;
+  functionName: string;
+  starterCode: Record<Language, string>;
+  tests: PublicTestCase[];
+}
+
+/** Body von `POST /runs`: eine Lösung gegen die sichtbaren Tests einer Kata ausführen. */
+export const startRunSchema = z.object({
+  slug: z.string().min(1),
+  language: languageSchema,
+  code: z.string().min(1).max(MAX_CODE_LENGTH),
+});
+export type StartRun = z.infer<typeof startRunSchema>;
+
+export interface RunResponse {
+  status: RunStatus;
+  passedTests: number;
+  totalTests: number;
+  durationMs: number;
+  tests: TestOutcome[];
+  /** Konsolenausgaben des Nutzercodes (Harness leitet sie nach stderr). */
+  output: string;
+  error?: string;
+}
+
 /**
  * Eingabe für das Harness im Container. Enthält bewusst keine Erwartungswerte,
  * damit versteckte Tests nicht aus der Sandbox ausgelesen werden können.

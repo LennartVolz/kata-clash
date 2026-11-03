@@ -14,6 +14,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "dev:server": "pnpm --filter @kata-clash/server dev",
+    "dev:web": "pnpm --filter @kata-clash/web dev",
     "dev:runner": "pnpm --filter @kata-clash/runner dev",
     "runner:images": "docker build -t kata-clash/js:latest -f docker/javascript/Dockerfile docker && docker build -t kata-clash/python:latest -f docker/python/Dockerfile docker",
     "runner:job": "pnpm --filter @kata-clash/runner start",

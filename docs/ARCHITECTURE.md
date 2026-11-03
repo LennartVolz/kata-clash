@@ -71,6 +71,19 @@ Update: `R_A' = R_A + K · (S_A − E_A)`, mit `S = 1` Sieg, `0,5` Remis, `0` Ni
 - Harte Limits: CPU, RAM, PIDs, Laufzeit, Ausgabegröße; kein Netzwerk; read-only Root-FS.
 - Details siehe [SECURITY.md](SECURITY.md).
 
+## REST-API (Phase 2)
+
+| Endpunkt           | Zweck                                                                    |
+| ------------------ | ------------------------------------------------------------------------ |
+| `GET /katas`       | Katalog mit Slug, Titel, Schwierigkeit und Testanzahl                    |
+| `GET /katas/:slug` | Kata mit Beschreibung, Starter-Code für beide Sprachen, sichtbaren Tests |
+| `POST /runs`       | `{ slug, language, code }` gegen die sichtbaren Tests ausführen          |
+
+`POST /runs` baut aus Kata und Code einen Runner-Job und startet die Runner-CLI als
+Kindprozess (`apps/server/src/runner.ts`). Versteckte Tests bleiben im Server. Die Next-App
+spricht nur mit ihrer eigenen Route `/api/run`; die reicht die Anfrage an die API weiter, damit
+die API keine CORS-Konfiguration braucht.
+
 ## Skalierung
 
 - Socket.IO mit Redis-Adapter erlaubt mehrere Gateway-Instanzen.

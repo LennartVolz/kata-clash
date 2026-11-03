@@ -9,8 +9,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@kata-clash/katas": "workspace:*",
     "@kata-clash/shared": "workspace:*",
-    "fastify": "^5.12.8"
+    "fastify": "^5.12.8",
+    "tsx": "^4.23.15"
   },
   "devDependencies": {
     "tsx": "^4.23.15"
