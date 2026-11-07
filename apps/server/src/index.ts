@@ -1,3 +1,5 @@
+import './env';
+
 import { buildApp } from './app';
 import { loadRealtimeConfig } from './realtime/config';
 import { startRealtime, type RealtimeHandle } from './realtime/start';

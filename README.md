@@ -83,4 +83,5 @@ pnpm format:check && pnpm lint && pnpm typecheck && pnpm test
 gesetzt sind (siehe `.env.example`); ohne die beiden Variablen läuft nur die REST-API. Matchmaking
 und Matches brauchen `pnpm infra:up` (Redis + PostgreSQL). Der Browser verbindet sich über
 `NEXT_PUBLIC_SERVER_URL` (Standard `http://localhost:4000`) per Socket.IO; `WEB_ORIGIN` muss die
-Adresse der Web-App erlauben.
+Adresse der Web-App erlauben. Beide Apps laden beim Start die `.env` aus dem Repo-Root; bereits
+gesetzte Umgebungsvariablen haben Vorrang. `AUTH_SECRET` muss in Web und Server identisch sein.
