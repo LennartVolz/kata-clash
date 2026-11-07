@@ -56,7 +56,10 @@ und Limit-Tests.
 ✅ Phase 2 abgeschlossen: Kata-Bibliothek (8 Katas), REST-API und Next.js-Oberfläche mit
 Monaco-Editor.
 ✅ Phase 3 abgeschlossen: Prisma-Schema samt Migration und Login über Auth.js
-(E-Mail/Passwort, optional GitHub) mit Profilseite. Echtzeit-Duelle folgen in Phase 4.
+(E-Mail/Passwort, optional GitHub) mit Profilseite.
+✅ Phase 4 abgeschlossen: Socket.IO-Gateway mit Auth.js-Handshake, Redis-Matchmaking und
+Match-Lebenszyklus samt Timer, Reconnect und Elo-Update. Die Duell-Oberfläche unter `/duell`
+verbindet sich per Socket.IO mit dem Gateway.
 
 ## Entwicklung
 
@@ -75,3 +78,9 @@ pnpm runner:job fixtures/js-sum.json     # einzelnen Kata-Job ausführen
 
 pnpm format:check && pnpm lint && pnpm typecheck && pnpm test
 ```
+
+`pnpm dev:server` startet zusätzlich das Socket.IO-Gateway, sobald `AUTH_SECRET` und `REDIS_URL`
+gesetzt sind (siehe `.env.example`); ohne die beiden Variablen läuft nur die REST-API. Matchmaking
+und Matches brauchen `pnpm infra:up` (Redis + PostgreSQL). Der Browser verbindet sich über
+`NEXT_PUBLIC_SERVER_URL` (Standard `http://localhost:4000`) per Socket.IO; `WEB_ORIGIN` muss die
+Adresse der Web-App erlauben.

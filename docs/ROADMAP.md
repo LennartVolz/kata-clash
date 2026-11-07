@@ -42,15 +42,23 @@ Duell-Endpunkte.
 
 ## Phase 4 – Echtzeit-Duell (MVP-Kern)
 
-- [ ] Socket.IO-Gateway, geteilte Event-Typen
-- [ ] Matchmaking-Queue, Match-Lebenszyklus, Timer
-- [ ] Gegner-Fortschritt, Siegbedingung, Reconnect-Handling
+- [x] Socket.IO-Gateway, geteilte Event-Typen
+- [x] Matchmaking-Queue, Match-Lebenszyklus, Timer
+- [x] Gegner-Fortschritt, Siegbedingung, Reconnect-Handling
+
+Das Gateway läuft im Server-Prozess (`apps/server/src/realtime`) und prüft beim Handshake das
+Auth.js-Session-Cookie. Die Warteschlange liegt in Redis, der Match-Zustand prozesslokal.
+`match:start` liefert nur sichtbare Tests, `code:submit` bewertet alle und meldet versteckte Tests
+nur als Summe. Die Duell-Oberfläche unter `/duell` verbindet sich per Socket.IO mit dem Gateway.
 
 ## Phase 5 – Elo und Rangliste
 
 - [x] `packages/elo` mit Tests
-- [ ] Elo-Update nach Matchende
+- [x] Elo-Update nach Matchende
 - [ ] Rangliste und Profilstatistik
+
+Das Elo-Update passiert beim Match-Ende in derselben Transaktion wie Match und Teilnahmen
+(`apps/server/src/realtime/match-store.ts`).
 
 ## Phase 6 – Chat und Zuschauer
 

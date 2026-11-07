@@ -97,6 +97,21 @@ die API keine CORS-Konfiguration braucht.
   `prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script` erzeugen und
   später mit `prisma migrate deploy` anwenden.
 
+## Echtzeit-Gateway (Phase 4)
+
+- Socket.IO hängt am bestehenden Fastify-HTTP-Server (`apps/server/src/realtime`).
+- Der Handshake prüft das Auth.js-Session-JWT aus dem Cookie (`authjs.session-token`,
+  Salt = Cookie-Name); ohne gültige Session wird die Verbindung abgelehnt.
+- Die Warteschlange liegt in Redis (`ZSET` je Sprache, Wartezeit in einem Hash). Gepaart wird nach
+  Wartezeit; die erlaubte Elo-Differenz wächst mit ihr.
+- Der Match-Zustand (Kata, Countdown, Timer) liegt prozesslokal. Eine zweite Gateway-Instanz
+  bräuchte dafür noch einen gemeinsamen Store.
+- `match:start` enthält nur sichtbare Tests. `code:submit` prüft alle Tests, versteckte Ergebnisse
+  erscheinen nur in den Summen; Sieger und Elo entscheidet ausschließlich der Server.
+- Reconnects betreten den Match-Room erneut und erhalten `match:start` bzw. `match:found` noch einmal.
+- Die Web-Oberfläche (`apps/web/app/duell`) verbindet sich mit `withCredentials`, damit das
+  Session-Cookie mitgeht; sie zeigt Warteschlange, Countdown, Gegner-Fortschritt und Ergebnis.
+
 ## Skalierung
 
 - Socket.IO mit Redis-Adapter erlaubt mehrere Gateway-Instanzen.

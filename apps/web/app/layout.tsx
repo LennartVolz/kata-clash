@@ -24,7 +24,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <span className="tagline">Solo-Training</span>
           <nav className="site-nav">
             {session?.user ? (
-              <Link href="/profil">{session.user.name ?? 'Profil'}</Link>
+              <>
+                <Link href="/duell">Duell</Link>
+                <Link href="/profil">{session.user.name ?? 'Profil'}</Link>
+              </>
             ) : (
               <Link href="/login">Anmelden</Link>
             )}

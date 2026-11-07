@@ -193,3 +193,157 @@ function sortKeys(value: unknown): unknown {
   }
   return value;
 }
+
+// --- Live-Duelle (Phase 4) ---------------------------------------------------
+
+/** Zeitstempel als Unix-Millisekunden, damit Client und Server zeitzonenfrei rechnen. */
+const timestampSchema = z.number().int().nonnegative();
+
+/** Öffentliche Gegner-Ansicht – ohne E-Mail oder andere Profildaten. */
+export const opponentSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  elo: z.number().int(),
+});
+export type Opponent = z.infer<typeof opponentSchema>;
+
+/** Grund für das Matchende. `solved` = alle Tests grün, `timeout` = Zeit abgelaufen. */
+export const MATCH_END_REASONS = ['solved', 'timeout', 'forfeit', 'abandoned'] as const;
+export const matchEndReasonSchema = z.enum(MATCH_END_REASONS);
+export type MatchEndReason = z.infer<typeof matchEndReasonSchema>;
+
+/** Ein sichtbarer Testfall, wie ihn ein Duell-Start mitliefert. */
+export const publicTestCaseSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  args: z.array(z.unknown()),
+  expected: z.unknown(),
+});
+
+/** Kata-Ansicht eines Duells: Beschreibung, Starter-Code und nur sichtbare Tests. */
+export const duelKataSchema = z.object({
+  slug: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  difficulty: kataDifficultySchema,
+  timeLimitSec: z.number().int().min(30).max(1800),
+  visibleTests: z.number().int().nonnegative(),
+  totalTests: z.number().int().positive(),
+  functionName: z.string().regex(/^[A-Za-z_$][A-Za-z0-9_$]*$/),
+  starterCode: z.object({
+    javascript: z.string().min(1),
+    python: z.string().min(1),
+  }),
+  tests: z.array(publicTestCaseSchema),
+});
+export type DuelKata = z.infer<typeof duelKataSchema>;
+
+// Client -> Server
+
+export const queueLeaveSchema = z.object({ language: languageSchema });
+export type QueueLeave = z.infer<typeof queueLeaveSchema>;
+
+export const codeRunSchema = z.object({
+  matchId: z.string().min(1),
+  code: z.string().max(MAX_CODE_LENGTH),
+});
+export type CodeRun = z.infer<typeof codeRunSchema>;
+
+// Server -> Client
+
+export const matchFoundSchema = z.object({
+  matchId: z.string().min(1),
+  opponent: opponentSchema,
+  /** Beginn des Duells (Epoch ms); davor läuft der Countdown. */
+  startsAt: timestampSchema,
+});
+export type MatchFound = z.infer<typeof matchFoundSchema>;
+
+export const matchStartSchema = z.object({
+  matchId: z.string().min(1),
+  kata: duelKataSchema,
+  startsAt: timestampSchema,
+  endsAt: timestampSchema,
+});
+export type MatchStart = z.infer<typeof matchStartSchema>;
+
+/** Einzelnes Testergebnis; Details versteckter Tests bleiben im Server. */
+export const runTestOutcomeSchema: z.ZodType<TestOutcome> = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  hidden: z.boolean(),
+  passed: z.boolean(),
+  durationMs: z.number().nonnegative(),
+  error: z.string().optional(),
+});
+
+export const runResultSchema = z.object({
+  matchId: z.string().min(1),
+  /** `run` prüft nur sichtbare Tests, `submit` alle. */
+  kind: z.enum(['run', 'submit']),
+  status: z.enum(RUN_STATUSES),
+  passedTests: z.number().int().nonnegative(),
+  totalTests: z.number().int().positive(),
+  tests: z.array(runTestOutcomeSchema),
+  durationMs: z.number().nonnegative(),
+  output: z.string(),
+  error: z.string().optional(),
+});
+export type RunResultEvent = z.infer<typeof runResultSchema>;
+
+export const opponentProgressSchema = z.object({
+  matchId: z.string().min(1),
+  testsPassed: z.number().int().nonnegative(),
+  totalTests: z.number().int().positive(),
+});
+export type OpponentProgress = z.infer<typeof opponentProgressSchema>;
+
+export const matchEndSchema = z.object({
+  matchId: z.string().min(1),
+  /** `null` bei Remis. */
+  winnerId: z.string().min(1).nullable(),
+  reason: matchEndReasonSchema,
+  /** Elo-Änderung aus Sicht des Empfängers; positiv = gewonnen. */
+  eloDelta: z.number().int(),
+  endedAt: timestampSchema,
+});
+export type MatchEnd = z.infer<typeof matchEndSchema>;
+
+/** Payload-Typen je Socket.IO-Event – Basis für typisierte Clients und Server. */
+export interface ClientToServerPayloads {
+  'queue:join': QueueJoin;
+  'queue:leave': QueueLeave;
+  'code:run': CodeRun;
+  'code:submit': CodeSubmit;
+}
+
+export interface ServerToClientPayloads {
+  'match:found': MatchFound;
+  'match:start': MatchStart;
+  'run:result': RunResultEvent;
+  'opponent:progress': OpponentProgress;
+  'match:end': MatchEnd;
+}
+
+/** Formt eine Payload-Map in die Handler-Signaturen, die Socket.IO erwartet. */
+export type SocketEventHandlers<T> = {
+  [K in keyof T]: (payload: T[K]) => void;
+};
+
+/** Vollständige Event-Hülle (`type` + Payload) zum Validieren eingehender Nachrichten. */
+export const clientEventSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('queue:join'), ...queueJoinSchema.shape }),
+  z.object({ type: z.literal('queue:leave'), ...queueLeaveSchema.shape }),
+  z.object({ type: z.literal('code:run'), ...codeRunSchema.shape }),
+  z.object({ type: z.literal('code:submit'), ...codeSubmitSchema.shape }),
+]);
+export type ClientEvent = z.infer<typeof clientEventSchema>;
+
+export const serverEventSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('match:found'), ...matchFoundSchema.shape }),
+  z.object({ type: z.literal('match:start'), ...matchStartSchema.shape }),
+  z.object({ type: z.literal('run:result'), ...runResultSchema.shape }),
+  z.object({ type: z.literal('opponent:progress'), ...opponentProgressSchema.shape }),
+  z.object({ type: z.literal('match:end'), ...matchEndSchema.shape }),
+]);
+export type ServerEvent = z.infer<typeof serverEventSchema>;

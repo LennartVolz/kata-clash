@@ -9,12 +9,18 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@auth/core": "0.41.3",
+    "@kata-clash/db": "workspace:*",
+    "@kata-clash/elo": "workspace:*",
     "@kata-clash/katas": "workspace:*",
     "@kata-clash/shared": "workspace:*",
     "fastify": "^5.12.8",
+    "redis": "^6.3.1",
+    "socket.io": "^4.8.4",
     "tsx": "^4.23.15"
   },
   "devDependencies": {
+    "socket.io-client": "^4.8.4",
     "tsx": "^4.23.15"
   }
 }

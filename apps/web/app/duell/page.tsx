@@ -1,0 +1,16 @@
+import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+
+import { auth } from '@/auth';
+
+import { DuelClient } from './duel-client';
+
+export const metadata: Metadata = { title: 'Live-Duell – Kata Clash' };
+export const dynamic = 'force-dynamic';
+
+export default async function DuelPage() {
+  const session = await auth();
+  if (!session?.user?.id) redirect('/login');
+
+  return <DuelClient playerId={session.user.id} playerName={session.user.name ?? 'Du'} />;
+}

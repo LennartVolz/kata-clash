@@ -1,8 +1,8 @@
-// Datenmodell für Phase 3: Nutzer und Auth.js. Matches folgen in Phase 4.
+// Datenmodell: Nutzer, Auth.js und Live-Duelle (Phase 4).
 generator client {
-  provider            = "prisma-client"
-  output              = "../src/generated/prisma"
-  moduleFormat        = "esm"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
 }
 
 datasource db {
@@ -11,20 +11,22 @@ datasource db {
 
 /// Nutzer mit Elo-Wert. `passwordHash` ist nur bei Credentials-Login gesetzt.
 model User {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String?
-  email         String    @unique
+  email         String        @unique
   emailVerified DateTime?
   image         String?
   passwordHash  String?
-  elo           Int       @default(1200)
-  wins          Int       @default(0)
-  losses        Int       @default(0)
-  draws         Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  elo           Int           @default(1200)
+  wins          Int           @default(0)
+  losses        Int           @default(0)
+  draws         Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   accounts      Account[]
   sessions      Session[]
+  matches       MatchPlayer[]
+  wonMatches    Match[]       @relation("MatchWinner")
 }
 
 /// Verknüpft OAuth-Konten (z. B. GitHub) mit einem Nutzer.
@@ -61,4 +63,57 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+/// Sprachen, in denen Duelle ausgetragen werden (siehe `LANGUAGES` in @kata-clash/shared).
+enum Language {
+  javascript
+  python
+}
+
+/// Lebenszyklus eines Duells: angelegt, läuft, beendet oder abgebrochen.
+enum MatchStatus {
+  WAITING
+  RUNNING
+  FINISHED
+  ABORTED
+}
+
+/// Ein Duell zweier Spieler über eine Kata. Katas liegen im Code (`packages/katas`), daher nur der Slug.
+model Match {
+  id        String        @id @default(cuid())
+  kataSlug  String
+  language  Language
+  status    MatchStatus   @default(WAITING)
+  startsAt  DateTime?
+  /// Geplantes Ende (Start + Zeitlimit der Kata).
+  endsAt    DateTime?
+  endedAt   DateTime?
+  winnerId  String?
+  winner    User?         @relation("MatchWinner", fields: [winnerId], references: [id], onDelete: SetNull)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  players   MatchPlayer[]
+
+  @@index([status, createdAt])
+  @@index([winnerId])
+}
+
+/// Teilnahme eines Spielers: Elo vor/nach dem Duell, Ergebnis und abgegebener Code.
+model MatchPlayer {
+  id          String    @id @default(cuid())
+  matchId     String
+  userId      String
+  eloBefore   Int
+  eloAfter    Int?
+  testsPassed Int       @default(0)
+  finalCode   String?
+  finishedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  match       Match     @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([matchId, userId])
+  @@index([userId])
 }
